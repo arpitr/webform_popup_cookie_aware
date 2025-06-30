@@ -1,0 +1,8 @@
+name: 'Webform Popup'
+type: module
+description: 'Shows a popup with a Webform on node pages. Popup is hidden after submission using cookies.'
+core_version_requirement: ^10 || ^11
+package: Custom
+dependencies:
+  - webform:webform
+configure: webform_popup.settings

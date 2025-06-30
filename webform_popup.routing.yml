@@ -1,0 +1,7 @@
+webform_popup.settings:
+  path: '/admin/config/content/webform-popup'
+  defaults:
+    _form: '\Drupal\webform_popup\Form\WebformPopupSettingsForm'
+    _title: 'Webform Popup settings'
+  requirements:
+    _permission: 'administer site configuration'
