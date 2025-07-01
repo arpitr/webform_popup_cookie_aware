@@ -22,7 +22,7 @@ class WebformPopupCookieAwareHandler extends WebformHandlerBase {
    * {@inheritdoc}
    */
   public function getSummary() {
-    return $this->t('Sets a cookie when this webform is submitted for popup control.');
+    return $this->t('Set session key webform_popup_set_cookie. Session is further used in Event Susbcriber to set the key.');
   }
 
   /**
