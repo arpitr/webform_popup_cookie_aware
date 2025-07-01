@@ -1,8 +1,7 @@
 /**
  * @file
- * Styles for the Webform Popup module.
+ * Styles for the Webform Popup Cookie Aware module.
  */
- 
 .webform-popup-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;

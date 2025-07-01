@@ -1,10 +1,10 @@
 popup:
   version: 1.x
   js:
-    js/webform_popup.js: {}
+    js/webform_popup_cookie_aware.js: {}
   css:
     theme:
-      css/webform_popup.css: {}
+      css/webform_popup_cookie_aware.css: {}
   dependencies:
     - core/jquery
     - core/once

@@ -1,0 +1,13 @@
+webform_popup_cookie_aware.settings:
+  path: '/admin/config/content/webform-popup-cookie-aware'
+  defaults:
+    _form: '\Drupal\webform_popup_cookie_aware\Form\WebformPopupCookieAwareSettingsForm'
+    _title: 'Webform Popup Cookie Aware settings'
+  requirements:
+    _permission: 'administer site configuration'
+webform_popup_cookie_aware.webform_ajax:
+  path: '/webform-popup-cookie-aware/ajax/{webform_id}'
+  defaults:
+    _controller: '\Drupal\webform_popup_cookie_aware\Controller\WebformPopupCookieAwareController::ajaxWebform'
+  requirements:
+    _permission: 'access content'

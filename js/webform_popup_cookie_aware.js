@@ -9,12 +9,15 @@
   /**
    * Webform Popup behavior.
    */
-  Drupal.behaviors.webformPopup = {
+  Drupal.behaviors.webformPopupCookieAwarewebformPopup = {
     attach: function (context, settings) {
+      console.log('Webform Popup Cookie Aware behavior attached.'); 
       once('webform-popup', '#webform-popup-overlay', context).forEach(function (element) {
         var $popup = $(element);
         $popup.hide();
         var cookieName = $popup.data('cookie-name') || 'webform_popup_submitted';
+        var webformId = $popup.data('webform-id');
+        var $placeholder = $('#webform-popup-form-placeholder', $popup);
 
         /**
          * Get a cookie value by name.
@@ -34,10 +37,23 @@
           return null;
         }
 
+        function loadWebform() {
+          if ($placeholder.children().length === 0 && webformId) {
+            $.get(Drupal.url('webform-popup-cookie-aware/ajax/' + webformId), function (data) {
+              if (data.form) {
+                $placeholder.html(data.form);
+                // Re-attach behaviors for the loaded form.
+                Drupal.attachBehaviors($placeholder[0]);
+              }
+            });
+          }
+        }
+
         console.log('Webform Popup: Cookie not found, showing popup.', cookieName);    
         console.log(getCookie(cookieName)); 
         if (!getCookie(cookieName)) {   
           $popup.show();
+          loadWebform();
         }
 
         $popup.find('#webform-popup-close').on('click', function () {

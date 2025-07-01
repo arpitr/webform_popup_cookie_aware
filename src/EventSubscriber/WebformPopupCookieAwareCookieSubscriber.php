@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\webform_popup\EventSubscriber;
+namespace Drupal\webform_popup_cookie_aware\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Sets the webform popup cookie on response if flagged in session.
  */
-class WebformPopupCookieSubscriber implements EventSubscriberInterface {
+class WebformPopupCookieAwareCookieSubscriber implements EventSubscriberInterface {
 
   /**
    * The config factory.

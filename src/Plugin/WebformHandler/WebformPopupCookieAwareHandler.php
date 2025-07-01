@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\webform_popup\Plugin\WebformHandler;
+namespace Drupal\webform_popup_cookie_aware\Plugin\WebformHandler;
 
 use Drupal\webform\Plugin\WebformHandlerBase;
 use Drupal\webform\WebformSubmissionInterface;
@@ -9,14 +9,21 @@ use Drupal\webform\WebformSubmissionInterface;
  * Set a cookie when this webform is submitted.
  *
  * @WebformHandler(
- *   id = "webform_popup_cookie",
- *   label = @Translation("Webform Popup: Set Cookie"),
+ *   id = "webform_popup_cookie_aware",
+ *   label = @Translation("Webform Popup Cookie Aware: Set Cookie"),
  *   category = @Translation("Custom"),
  *   description = @Translation("Sets a browser cookie when the webform is submitted."),
  *   cardinality = \Drupal\webform\Plugin\WebformHandlerInterface::CARDINALITY_UNLIMITED,
  * )
  */
-class WebformPopupCookieHandler extends WebformHandlerBase {
+class WebformPopupCookieAwareHandler extends WebformHandlerBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSummary() {
+    return $this->t('Sets a cookie when this webform is submitted for popup control.');
+  }
 
   /**
    * {@inheritdoc}
