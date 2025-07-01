@@ -7,3 +7,4 @@ popup:
       css/webform_popup.css: {}
   dependencies:
     - core/jquery
+    - core/once

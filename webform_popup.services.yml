@@ -1,0 +1,6 @@
+services:
+  webform_popup.cookie_subscriber:
+    class: Drupal\webform_popup\EventSubscriber\WebformPopupCookieSubscriber
+    arguments: ['@config.factory']
+    tags:
+      - { name: event_subscriber }

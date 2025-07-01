@@ -1,8 +1,8 @@
-name: 'Webform Popup'
+name: 'Webform Popup Cookie Aware'
 type: module
-description: 'Shows a popup with a Webform on node pages. Popup is hidden after submission using cookies.'
+description: 'Shows a popup with a Webform on node pages. Popup is hidden after submission using cookies, with per-content-type configuration.'
 core_version_requirement: ^10 || ^11
 package: Custom
 dependencies:
   - webform:webform
-configure: webform_popup.settings
+configure: webform_popup_cookie_aware.settings

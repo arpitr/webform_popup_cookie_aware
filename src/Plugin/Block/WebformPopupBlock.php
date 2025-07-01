@@ -5,6 +5,7 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\webform\Entity\Webform;
 
 /**
@@ -25,11 +26,30 @@ class WebformPopupBlock extends BlockBase implements ContainerFactoryPluginInter
   protected $routeMatch;
 
   /**
-   * Constructs a new WebformPopupBlock instance.
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteMatchInterface $route_match) {
+  protected $configFactory;
+
+  /**
+   * Constructs a new WebformPopupBlock instance.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin ID for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The current route match.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
+   */
+   public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteMatchInterface $route_match, ConfigFactoryInterface $config_factory) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->routeMatch = $route_match;
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -40,7 +60,8 @@ class WebformPopupBlock extends BlockBase implements ContainerFactoryPluginInter
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('current_route_match')
+      $container->get('current_route_match'),
+      $container->get('config.factory')
     );
   }
 
@@ -53,20 +74,26 @@ class WebformPopupBlock extends BlockBase implements ContainerFactoryPluginInter
       return [];
     }
 
-    $config = \Drupal::config('webform_popup.settings');
-    $enabled_types = $config->get('enabled_node_types') ?: [];
-    if (empty($enabled_types[$node->bundle()])) {
+    $config = $this->configFactory->get('webform_popup.settings');
+    $mapping = $config->get('content_type_webform_map') ?: [];
+    $bundle = $node->bundle();
+
+    if (empty($mapping[$bundle]['webform'])) {
       return [];
     }
 
-    $webform_id = $config->get('webform_id') ?: 'contact';
+    $webform_id = $mapping[$bundle]['webform'];
+    $cookie_expiry = !empty($mapping[$bundle]['cookie_expiry']) ? (int) $mapping[$bundle]['cookie_expiry'] : 365;
+
     $webform = Webform::load($webform_id);
     if (!$webform) {
       return [];
     }
-      // Build the popup markup with the webform as a child.
+
+    $cookie_name = 'webform_popup_submitted_' . $webform_id;
+
     return [
-      '#prefix' => '<div id="webform-popup-overlay" class="webform-popup-overlay" style="display:none;"><div class="webform-popup-content"><button id="webform-popup-close" class="webform-popup-close" type="button">&times;</button>',
+      '#prefix' => '<div id="webform-popup-overlay" class="webform-popup-overlay" style="display:none;" data-webform-id="' . $webform_id . '" data-cookie-name="' . $cookie_name . '" data-cookie-expiry="' . $cookie_expiry . '"><div class="webform-popup-content"><button id="webform-popup-close" class="webform-popup-close" type="button">&times;</button>',
       '#suffix' => '</div></div>',
       'form' => [
         '#type' => 'webform',
@@ -80,4 +107,5 @@ class WebformPopupBlock extends BlockBase implements ContainerFactoryPluginInter
       ],
     ];
   }
+
 }

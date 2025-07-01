@@ -5,6 +5,7 @@ namespace Drupal\webform_popup\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\NodeType;
+use Drupal\webform\Entity\Webform;
 
 /**
  * Configure settings for Webform Popup.
@@ -33,25 +34,46 @@ class WebformPopupSettingsForm extends ConfigFormBase {
 
     // Get all node types.
     $node_types = NodeType::loadMultiple();
-    $options = [];
+    $node_type_options = [];
     foreach ($node_types as $type) {
-      $options[$type->id()] = $type->label();
+      $node_type_options[$type->id()] = $type->label();
     }
 
-    $form['enabled_node_types'] = [
-      '#type' => 'checkboxes',
-      '#title' => $this->t('Show popup on these content types'),
-      '#options' => $options,
-      '#default_value' => $config->get('enabled_node_types') ?: [],
-      '#description' => $this->t('Select the content types where the popup should appear.'),
+    // Get all webforms.
+    $webforms = Webform::loadMultiple();
+    $webform_options = [];
+    foreach ($webforms as $webform) {
+      $webform_options[$webform->id()] = $webform->label();
+    }
+
+    $mapping = $config->get('content_type_webform_map') ?: [];
+
+    $form['content_type_webform_map'] = [
+      '#type' => 'table',
+      '#header' => [
+        $this->t('Content type'),
+        $this->t('Webform'),
+        $this->t('Cookie expiry (days)'),
+      ],
+      '#empty' => $this->t('No content types found.'),
     ];
 
-    $form['webform_id'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Webform ID'),
-      '#default_value' => $config->get('webform_id') ?: 'contact',
-      '#description' => $this->t('Enter the machine name of the webform to show in the popup.'),
-    ];
+    foreach ($node_type_options as $type_id => $type_label) {
+      $form['content_type_webform_map'][$type_id]['content_type'] = [
+        '#markup' => $type_label,
+      ];
+      $form['content_type_webform_map'][$type_id]['webform'] = [
+        '#type' => 'select',
+        '#options' => ['' => $this->t('- None -')] + $webform_options,
+        '#default_value' => isset($mapping[$type_id]['webform']) ? $mapping[$type_id]['webform'] : '',
+      ];
+      $form['content_type_webform_map'][$type_id]['cookie_expiry'] = [
+        '#type' => 'number',
+        '#min' => 1,
+        '#default_value' => isset($mapping[$type_id]['cookie_expiry']) ? $mapping[$type_id]['cookie_expiry'] : 365,
+        '#size' => 5,
+      ];
+    }
 
     return parent::buildForm($form, $form_state);
   }
@@ -60,9 +82,19 @@ class WebformPopupSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $mapping = [];
+    if ($form_state->getValue('content_type_webform_map')) {
+      foreach ($form_state->getValue('content_type_webform_map') as $type_id => $row) {
+        if (!empty($row['webform'])) {
+          $mapping[$type_id] = [
+            'webform' => $row['webform'],
+            'cookie_expiry' => !empty($row['cookie_expiry']) ? (int) $row['cookie_expiry'] : 365,
+          ];
+        }
+      }
+    }
     $this->config('webform_popup.settings')
-      ->set('enabled_node_types', array_filter($form_state->getValue('enabled_node_types')))
-      ->set('webform_id', $form_state->getValue('webform_id'))
+      ->set('content_type_webform_map', $mapping)
       ->save();
 
     parent::submitForm($form, $form_state);

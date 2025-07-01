@@ -1,35 +1,50 @@
-(function ($, Drupal) {
+/**
+ * @file
+ * Webform Popup behavior for showing/hiding the popup based on a cookie.
+ */
+
+(function ($, Drupal, once) {
+  'use strict';
+
+  /**
+   * Webform Popup behavior.
+   */
   Drupal.behaviors.webformPopup = {
     attach: function (context, settings) {
-      if (window.webformPopupInitialized) return;
-      window.webformPopupInitialized = true;
+      once('webform-popup', '#webform-popup-overlay', context).forEach(function (element) {
+        var $popup = $(element);
+        $popup.hide();
+        var cookieName = $popup.data('cookie-name') || 'webform_popup_submitted';
 
-      function getCookie(name) {
-        let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-        return match ? match[2] : null;
-      }
-      function setCookie(name, value, days) {
-        let expires = "";
-        if (days) {
-          let date = new Date();
-          date.setTime(date.getTime() + (days*24*60*60*1000));
-          expires = "; expires=" + date.toUTCString();
+        /**
+         * Get a cookie value by name.
+         *
+         * @param {string} name
+         *   The name of the cookie.
+         *
+         * @return {string|null}
+         *   The cookie value or null if not found.
+         */
+        function getCookie(name) {
+          var value = '; ' + document.cookie;
+          var parts = value.split('; ' + name + '=');
+          if (parts.length === 2) {
+            return parts.pop().split(';').shift();
+          }
+          return null;
         }
-        document.cookie = name + "=" + value + expires + "; path=/";
-      }
 
-      if (!getCookie('webform_popup_submitted')) {
-        $('#webform-popup-overlay').show();
-      }
+        console.log('Webform Popup: Cookie not found, showing popup.', cookieName);    
+        console.log(getCookie(cookieName)); 
+        if (!getCookie(cookieName)) {   
+          $popup.show();
+        }
 
-      $('#webform-popup-close').on('click', function () {
-        $('#webform-popup-overlay').hide();
-      });
-
-      $('#webform-popup-form').on('submit', function () {
-        setCookie('webform_popup_submitted', '1', 365);
-        $('#webform-popup-overlay').hide();
+        $popup.find('#webform-popup-close').on('click', function () {
+          $popup.hide();
+        });
       });
     }
   };
-})(jQuery, Drupal);
+
+})(jQuery, Drupal, once);
