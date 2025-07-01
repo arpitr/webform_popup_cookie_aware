@@ -1,5 +1,6 @@
 <?php
-namespace Drupal\webform_popup\Plugin\Block;
+
+namespace Drupal\webform_popup_cookie_aware\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -9,14 +10,14 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\webform\Entity\Webform;
 
 /**
- * Provides a 'Webform Popup' block.
+ * Provides a 'Webform Popup Cookie Aware' block.
  *
  * @Block(
- *   id = "webform_popup_block",
- *   admin_label = @Translation("Webform Popup Block"),
+ *   id = "webform_popup_cookie_aware_block",
+ *   admin_label = @Translation("Webform Popup Cookie Aware Block"),
  * )
  */
-class WebformPopupBlock extends BlockBase implements ContainerFactoryPluginInterface {
+class WebformPopupCookieAwareBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
    * The current route match.
@@ -33,20 +34,9 @@ class WebformPopupBlock extends BlockBase implements ContainerFactoryPluginInter
   protected $configFactory;
 
   /**
-   * Constructs a new WebformPopupBlock instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
+   * Constructs a new WebformPopupCookieAwareBlock instance.
    */
-   public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteMatchInterface $route_match, ConfigFactoryInterface $config_factory) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteMatchInterface $route_match, ConfigFactoryInterface $config_factory) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->routeMatch = $route_match;
     $this->configFactory = $config_factory;
@@ -74,7 +64,7 @@ class WebformPopupBlock extends BlockBase implements ContainerFactoryPluginInter
       return [];
     }
 
-    $config = $this->configFactory->get('webform_popup.settings');
+    $config = $this->configFactory->get('webform_popup_cookie_aware.settings');
     $mapping = $config->get('content_type_webform_map') ?: [];
     $bundle = $node->bundle();
 
@@ -95,16 +85,19 @@ class WebformPopupBlock extends BlockBase implements ContainerFactoryPluginInter
     return [
       '#prefix' => '<div id="webform-popup-overlay" class="webform-popup-overlay" style="display:none;" data-webform-id="' . $webform_id . '" data-cookie-name="' . $cookie_name . '" data-cookie-expiry="' . $cookie_expiry . '"><div class="webform-popup-content"><button id="webform-popup-close" class="webform-popup-close" type="button">&times;</button>',
       '#suffix' => '</div></div>',
-      'form' => [
-        '#type' => 'webform',
-        '#webform' => $webform_id,
-        '#attributes' => ['id' => 'webform-popup-form'],
+      'placeholder' => [
+        '#markup' => '<div id="webform-popup-form-placeholder"></div>',
       ],
       '#attached' => [
         'library' => [
-          'webform_popup/popup',
+          'webform_popup_cookie_aware/popup',
         ],
       ],
+      '#cache' => [
+        'contexts' => ['url'],
+      ],
+      '#webform' => $webform_id,
+      '#attributes' => ['id' => 'webform-popup-form'],
     ];
   }
 

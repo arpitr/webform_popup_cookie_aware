@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\webform_popup\Form;
+namespace Drupal\webform_popup_cookie_aware\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -8,29 +8,29 @@ use Drupal\node\Entity\NodeType;
 use Drupal\webform\Entity\Webform;
 
 /**
- * Configure settings for Webform Popup.
+ * Configure settings for Webform Popup Cookie Aware.
  */
-class WebformPopupSettingsForm extends ConfigFormBase {
+class WebformPopupCookieAwareSettingsForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return ['webform_popup.settings'];
+    return ['webform_popup_cookie_aware.settings'];
   }
 
   /**
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'webform_popup_settings_form';
+    return 'webform_popup_cookie_aware_settings_form';
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('webform_popup.settings');
+    $config = $this->config('webform_popup_cookie_aware.settings');
 
     // Get all node types.
     $node_types = NodeType::loadMultiple();
@@ -93,7 +93,7 @@ class WebformPopupSettingsForm extends ConfigFormBase {
         }
       }
     }
-    $this->config('webform_popup.settings')
+    $this->config('webform_popup_cookie_aware.settings')
       ->set('content_type_webform_map', $mapping)
       ->save();
 
