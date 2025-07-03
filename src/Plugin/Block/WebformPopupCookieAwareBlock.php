@@ -8,6 +8,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\webform\Entity\Webform;
+use Drupal\Core\Cache\Cache;
+
 
 /**
  * Provides a 'Webform Popup Cookie Aware' block.
@@ -93,12 +95,16 @@ class WebformPopupCookieAwareBlock extends BlockBase implements ContainerFactory
           'webform_popup_cookie_aware/popup',
         ],
       ],
-      '#cache' => [
-        'contexts' => ['url'],
-      ],
       '#webform' => $webform_id,
       '#attributes' => ['id' => 'webform-popup-form'],
     ];
+  }
+
+  /**
+  * {@inheritdoc}
+  */
+  public function getCacheContexts() {
+    return Cache::mergeContexts(parent::getCacheContexts(), ['url.path', 'url.query_args']);
   }
 
 }
