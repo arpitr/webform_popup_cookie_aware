@@ -51,7 +51,7 @@ class WebformPopupCookieAwareCookieSubscriber implements EventSubscriberInterfac
     $session = $request->getSession();
     if ($session->has('webform_popup_set_cookie')) {
       $webform_id = $session->get('webform_popup_set_cookie');
-      $config = $this->configFactory->get('webform_popup.settings');
+      $config = $this->configFactory->get('webform_popup_cookie_aware.settings');
       $mapping = $config->get('content_type_webform_map') ?: [];
 
       // Find the configured expiry for this webform.

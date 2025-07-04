@@ -18,11 +18,15 @@ use Drupal\webform\WebformSubmissionInterface;
  */
 class WebformPopupCookieAwareHandler extends WebformHandlerBase {
 
-  /**
+    /**
    * {@inheritdoc}
    */
   public function getSummary() {
-    return $this->t('Sets a cookie when this webform is submitted for popup control.');
+    return [
+      'message' => [
+        '#markup' => $this->t('Sets a cookie when this webform is submitted for popup control.'),
+      ],
+    ];
   }
 
   /**
